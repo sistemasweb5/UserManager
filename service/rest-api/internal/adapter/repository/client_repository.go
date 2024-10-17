@@ -7,19 +7,19 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-type UserRepository struct {
+type ClientRepository struct {
 	db Database
 }
 
-func NewUserRepository(database Database) UserRepository {
-	return UserRepository{
+func NewClientRepository(database Database) ClientRepository {
+	return ClientRepository{
 		db: database,
 	}
 }
 
-func (r UserRepository) GetAll() (*[]domain.User, error) {
+func (r ClientRepository) GetAll() (*[]domain.Client, error) {
 	query := `
-		SELECT * FROM user
+		SELECT * FROM client
 	`
 	rows, err := r.db.query(query)
 	if err != nil {
@@ -28,7 +28,7 @@ func (r UserRepository) GetAll() (*[]domain.User, error) {
 	}
 	defer rows.Close()
 
-	array, err := pgx.CollectRows(rows, pgx.RowToStructByName[domain.User])
+	array, err := pgx.CollectRows(rows, pgx.RowToStructByName[domain.Client])
 	if err != nil {
 		log.Printf("Error, could not create array: %v", err)
 		return nil, err
