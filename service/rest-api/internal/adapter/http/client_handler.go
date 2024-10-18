@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"service/rest-api/internal/port/in"
 
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )
 
@@ -26,4 +27,20 @@ func (handler *ClientHandler) GetAllClients(context echo.Context) error {
 		})
 	}
 	return context.JSON(http.StatusOK, clients)
+}
+
+func (handler *ClientHandler) GetClientById(context echo.Context) error {
+	id, err := uuid.Parse(context.Param("id"))
+	if err != nil {
+		log.Printf("Could not parse id: %v", err)
+		return err
+	}
+
+	client, err := handler.service.GetById(&id)
+	if err != nil {
+		log.Printf("Could not get client: %v", err)
+		return err
+	}
+
+	return context.JSON(http.StatusOK, client)
 }

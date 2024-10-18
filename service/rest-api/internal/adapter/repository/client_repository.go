@@ -4,6 +4,8 @@ import (
 	"log"
 
 	"service/rest-api/internal/core/domain"
+
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -35,4 +37,20 @@ func (r ClientRepository) GetAll() (*[]domain.Client, error) {
 	}
 	
 	return &array, nil
+}
+
+func (r ClientRepository) GetById(id *uuid.UUID) (*domain.Client, error) {
+	query := `
+		SELECT * FROM client WHERE id = @clientId
+	`
+	args := pgx.NamedArgs{
+        "clientId": *id,
+    }
+
+	var client domain.Client
+	err := r.db.queryRow(query, args).Scan(&client.Id, &client.Name, &client.EmailAddress, &client.CategoryId)
+	if err != nil {
+		return nil, err
+	}
+	return &client, nil
 }

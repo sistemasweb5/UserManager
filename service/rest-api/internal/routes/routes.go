@@ -18,4 +18,5 @@ func RegisterRoutes(e *echo.Echo, conn *pgx.Conn) {
 	clientHandler := adapter.NewClientHandler(clientService)
 
 	e.GET("/client", clientHandler.GetAllClients)
+	e.GET("/client/:id", clientHandler.GetClientById)
 }
