@@ -3,6 +3,7 @@ package endpoints
 import (
 	"api/testing/petitions"
 	"log"
+	"net/http"
 	"net/url"
 )
 
@@ -13,15 +14,20 @@ type Client struct {
 	CategoryId   string
 }
 
+type Category struct {
+	Id  string
+	Rol string
+}
+
 type ClientTest struct {
 	Address url.URL
 }
 
-func (b ClientTest) GetAll() (int, error) {
+func (b ClientTest) GetAll() (*http.Response, error) {
 	return petitions.SimpleRequest(b.Address)
 }
 
-func (b ClientTest) GetById(id string) (int, error) {
+func (b ClientTest) GetById(id string) (*http.Response, error) {
 	b.Address.Path = "client/" + id
 	return petitions.SimpleRequest(b.Address)
 }
