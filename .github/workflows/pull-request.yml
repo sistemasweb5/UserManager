@@ -1,0 +1,38 @@
+name: Endpoint integration testing
+run-name: ${{ github.actor }} is executing the workflow ${{ github.workflow }}.
+
+on:
+  pull_request:
+    branches: [develop, main]
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: ${{ vars.GO_VERSION }}
+    - name: Build
+      run: |
+        cd service
+        go mod tidy
+        go build -v ./...
+
+  test:
+    runs-on: ubuntu-20.04
+    needs: build
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: ${{ vars.GO_VERSION }}
+
+    - name: Run integration tests
+      run: |
+        docker -l warn compose -f service/UserManager-testing.yml up -d --build && docker ps
+        cd testing
+        TEST_DATABASE_URL=${{ secrets.TEST_DATABASE_URL }} go test -v ./endpoints/
+        docker -l warn compose -f service/UserManager-testing.yml down
