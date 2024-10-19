@@ -30,7 +30,6 @@ jobs:
       with:
         go-version: ${{ vars.GO_VERSION }}
 
-    - name: Verify dependencies
     - name: Run integration tests
       run: |
         docker -l warn compose -f service/UserManager-testing.yml up -d --build && docker ps
