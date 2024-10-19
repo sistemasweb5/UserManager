@@ -13,9 +13,10 @@ func RegisterRoutes(e *echo.Echo, conn *pgx.Conn) {
 		Connection: conn,
 	}
 
-	userRepo := repository.NewUserRepository(database)
-	userService := service.NewUserService(userRepo)
-	userHandler := adapter.NewUserHandler(userService)
+	clientRepo := repository.NewClientRepository(database)
+	clientService := service.NewClientService(clientRepo)
+	clientHandler := adapter.NewClientHandler(clientService)
 
-	e.GET("/user", userHandler.GetAllUsers)
+	e.GET("/client", clientHandler.GetAllClients)
+	e.GET("/client/:id", clientHandler.GetClientById)
 }
