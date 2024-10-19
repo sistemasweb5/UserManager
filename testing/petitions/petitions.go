@@ -3,7 +3,6 @@ package petitions
 import (
 	"bytes"
 	"encoding/json"
-	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -18,7 +17,7 @@ func marshalBody(body *any) *[]byte {
 	return &jsonBody
 }
 
-func BodyRequest(httpMethod string, postURL url.URL, body any) (int, error) {
+func BodyRequest(httpMethod string, postURL url.URL, body any) (*http.Response, error) {
 	log.Printf("Processing %s request: %s", httpMethod, postURL.String())
 	jsonBody := marshalBody(&body)
 	bodyReader := bytes.NewReader(*jsonBody)
@@ -26,7 +25,7 @@ func BodyRequest(httpMethod string, postURL url.URL, body any) (int, error) {
 	request, err := http.NewRequest(httpMethod, postURL.String(), bodyReader)
 	if err != nil {
 		log.Printf("Could not create %s request: %v", httpMethod, err)
-		return -1, err
+		return nil, err
 	}
 
 	if httpMethod != http.MethodPut || httpMethod != http.MethodPost {
@@ -36,43 +35,20 @@ func BodyRequest(httpMethod string, postURL url.URL, body any) (int, error) {
 	resp, err := http.DefaultClient.Do(request)
 	if err != nil {
 		log.Printf("Failed to execute %s request: %v", httpMethod, err)
-		return -1, err
+		return nil, err
 	}
-	defer resp.Body.Close()
 
-	if statusCode, err := handleRequest(httpMethod, *resp); err != nil {
-		return -1, err
-	} else {
-		return statusCode, nil
-	}
+	return resp, nil
 }
 
-func SimpleRequest(postURL url.URL) (int, error) {
+func SimpleRequest(postURL url.URL) (*http.Response, error) {
 	log.Printf("Processing GET request: %s", postURL.String())
 	resp, err := http.Get(postURL.String())
 	if err != nil {
 		log.Printf("An error occured during processing: %v", err)
-		return -1, err
-	}
-	defer resp.Body.Close()
-
-	statusCode, err := handleRequest("GET", *resp)
-	if err != nil {
-		log.Printf("Failed to execute %s request: %v", "GET", err)
-		return -1, err
+		return nil, err
 	}
 
-	return statusCode, err
+	return resp, nil
 }
 
-func handleRequest(httpMethod string, resp http.Response) (int, error) {
-	respBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatalf("Failed to read response: %v", err)
-	}
-	defer resp.Body.Close()
-	log.Print(resp.Status)
-	log.Println("Response:\n", string(respBody))
-
-	return resp.StatusCode, nil
-}

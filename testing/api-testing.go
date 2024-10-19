@@ -6,7 +6,7 @@ import (
 )
 
 func main(){
-    log.SetFlags(log.LstdFlags | log.Lshortfile)
+    log.SetFlags( log.Lshortfile)
     // endpoint.InitCognito("localhost:8181")
 
     log.Print("Starting API testing...")
