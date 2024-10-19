@@ -33,7 +33,7 @@ jobs:
       run: cd testing && go mod verify
     - name: Run integration tests
       run: |
-        docker compose -f service/UserManager-testing.yaml up -d --build
+        docker compose -f service/UserManager-testing.yml up -d --build
         cd testing
         TEST_DATABASE_URL=${{ secrets.TEST_DATABASE_URL }} go test -v ./endpoints/
-        docker compose -f service/UserManager-testing.yaml down
+        docker compose -f service/UserManager-testing.yml down
