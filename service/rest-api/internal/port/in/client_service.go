@@ -7,6 +7,6 @@ import (
 )
 
 type ClientService interface {
-	GetAll() (*[]domain.Client, error)
-	GetById(id *uuid.UUID) (*domain.Client, error)
+	GetAll() (*[]domain.ClientResponse, error)
+	GetById(id *uuid.UUID) (*domain.ClientResponse, error)
 }

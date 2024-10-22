@@ -7,6 +7,9 @@ import (
 )
 
 type ClientRepository interface {
-	GetAll() (*[]domain.Client, error)
-	GetById(id *uuid.UUID) (*domain.Client, error)
+	GetAllClients() (*[]domain.Client, error)
+	GetClientById(id *uuid.UUID) (*domain.Client, error)
+	GetCategoryById(id *uuid.UUID) (*domain.Category, error)
+	GetWorkScheduleById(id *uuid.UUID) (*domain.WorkSchedule, error)
+	GetSpecialitiesByClientId(id *uuid.UUID) (*[]domain.Specialty, error)
 }

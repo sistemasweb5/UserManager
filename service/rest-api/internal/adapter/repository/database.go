@@ -20,8 +20,8 @@ func (db *Database) execute(query string, args pgx.NamedArgs) error {
 	return nil
 }
 
-func (db *Database) query(query string) (pgx.Rows, error) {
-	return db.Connection.Query(context.Background(), query)
+func (db *Database) query(query string, args ...any) (pgx.Rows, error) {
+	return db.Connection.Query(context.Background(), query, args)
 }
 
 func (db *Database) queryRow(query string, args pgx.NamedArgs) pgx.Row {
