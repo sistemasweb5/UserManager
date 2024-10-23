@@ -17,5 +17,10 @@ func RegisterRoutes(e *echo.Echo, conn *pgx.Conn) {
 	userService := service.NewUserService(userRepo)
 	userHandler := adapter.NewUserHandler(userService)
 
+	cognitoClient := adapter.NewCognitoClient(os.Getenv("COGNITO_APP_CLIENT_ID"))
+	authService := service.NewAuthService(cognitoClient)
+	authHandler := adapter.NewAuthHandler(authService)
+
 	e.GET("/user", userHandler.GetAllUsers)
+	e.POST("/user/login", authHandler.Login)
 }
