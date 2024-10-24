@@ -25,22 +25,41 @@ func setup() {
 	}
 
 	categoryId := uuid.NewString()
+	userId := uuid.NewString()
+	workScheduleId := uuid.NewString()
 	client := endpoints.Client{
-		Id:           uuid.NewString(),
-		Name:         "Slim shady",
-		EmailAddress: "fake_email@mail.com",
-		CategoryId:   categoryId,
+		Id:             userId,
+		Name:           "Slim shady",
+		EmailAddress:   "fake_email@mail.com",
+		CategoryId:     categoryId,
+		WorkScheduleId: workScheduleId,
 	}
 	category := endpoints.Category{
 		Id:  categoryId,
-		Rol: "Plumber",
+		Rol: "Worker",
+	}
+	schedule := endpoints.WorkSchedule{
+		Id:        workScheduleId,
+		StartTime: "9.00",
+		EndTime:   "17.00",
+	}
+	specialty := endpoints.Specialty{
+		Id:     categoryId,
+		Name:   "Plumber",
+		ClientId: userId,
 	}
 
-	if err := db.InsertClient(&client); err != nil {
-		log.Fatalf("Could not populate category table: %v", err)
-	}
 	if err := db.InsertCategory(&category); err != nil {
-		log.Fatalf("Could not populate client table: %v", err)
+		log.Fatalf("Could not populate table: %v", err)
+	}
+	if err := db.InsertWorkSchedule(&schedule); err != nil {
+		log.Fatalf("Could not populate table: %v", err)
+	}
+	if err := db.InsertClient(&client); err != nil {
+		log.Fatalf("Could not populate table: %v", err)
+	}
+	if err := db.InsertSpecialty(&specialty); err != nil {
+		log.Fatalf("Could not populate table: %v", err)
 	}
 }
 
@@ -76,7 +95,7 @@ func TestGetById(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error: %v", err)
 	}
-	var clients []endpoints.Client
+	var clients []endpoints.ClientResponse
 	if err := json.Unmarshal(body, &clients); err != nil {
 		t.Errorf("Error: %v", err)
 	}
@@ -85,7 +104,7 @@ func TestGetById(t *testing.T) {
 	}
 	client := clients[0]
 
-	resp, err := clientEndpoint.GetById(client.Id)
+	resp, err := clientEndpoint.GetById(client.Client.Id)
 	defer resp.Body.Close()
 	if err != nil {
 		t.Errorf("Could not reach endpoint %s", clientEndpoint.Address.String())
@@ -106,7 +125,7 @@ func TestFetchInvalidId(t *testing.T) {
 		t.Errorf("Could not reach endpoint %s", clientEndpoint.Address.String())
 	}
 	statusCode := resp.StatusCode
-	if (statusCode >= 200 && statusCode <= 299) {
+	if statusCode >= 200 && statusCode <= 299 {
 		t.Errorf("Endpoint %s has failed", clientEndpoint.Address.String())
 	}
 }

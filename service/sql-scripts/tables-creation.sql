@@ -1,5 +1,4 @@
 -- Tables
-
 -- Table: category
 CREATE TABLE category (
     id UUID NOT NULL,
@@ -7,11 +6,27 @@ CREATE TABLE category (
     CONSTRAINT category_pk PRIMARY KEY (id)
 );
 
--- Table: "customer"
+-- Table: specialty
+CREATE TABLE specialty (
+    id UUID NOT NULL,
+    name VARCHAR NOT NULL,
+    clientId UUID NOT NULL,
+    CONSTRAINT specialty_pk PRIMARY KEY (id)
+);
+
+-- Table: work_schedule
+CREATE TABLE workSchedule (
+    id UUID NOT NULL,
+    startTime VARCHAR NOT NULL,
+    endTime VARCHAR NOT NULL,
+    CONSTRAINT work_schedule_pk PRIMARY KEY (id)
+);
+-- Table: client
 CREATE TABLE client (
     id UUID NOT NULL,
     name VARCHAR NOT NULL,
-    email_address VARCHAR NOT NULL,
-    category_id UUID NOT NULL,
-    CONSTRAINT user_pk PRIMARY KEY (id)
+    emailAddress VARCHAR NOT NULL,
+    categoryId UUID NOT NULL,
+    workScheduleId UUID NOT NULL,
+    CONSTRAINT client_pk PRIMARY KEY (id)
 );
