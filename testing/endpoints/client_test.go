@@ -106,7 +106,7 @@ func TestFetchInvalidId(t *testing.T) {
 		t.Errorf("Could not reach endpoint %s", clientEndpoint.Address.String())
 	}
 	statusCode := resp.StatusCode
-	if (statusCode >= 200 && statusCode <= 299) {
+	if statusCode >= 200 && statusCode <= 299 {
 		t.Errorf("Endpoint %s has failed", clientEndpoint.Address.String())
 	}
 }

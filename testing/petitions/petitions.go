@@ -52,3 +52,20 @@ func SimpleRequest(postURL url.URL) (*http.Response, error) {
 	return resp, nil
 }
 
+func SimplePostRequest(postURL url.URL, data interface{}) (*http.Response, error) {
+	log.Printf("Processing POST request: %s", postURL.String())
+
+	body, err := json.Marshal(data)
+	if err != nil {
+		log.Printf("Error marshalling request body: %v", err)
+		return nil, err
+	}
+
+	resp, err := http.Post(postURL.String(), "application/json", bytes.NewBuffer(body))
+	if err != nil {
+		log.Printf("An error occurred during processing: %v", err)
+		return nil, err
+	}
+
+	return resp, nil
+}
