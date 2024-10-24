@@ -15,7 +15,7 @@ func TestAuthHandler_SignIn_Success(t *testing.T) {
 
 	log.Println("Testing SignIn with valid credentials")
 	data := map[string]string{
-		"email":    "safaportafolios@gmail.com",
+		"email":    "test@gmail.com",
 		"password": "Pass@1234123",
 	}
 
