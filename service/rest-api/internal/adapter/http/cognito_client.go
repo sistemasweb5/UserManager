@@ -43,3 +43,12 @@ func (c *CognitoClient) SignIn(user domain.UserLogin) (string, error) {
 	}
 	return *result.AuthenticationResult.AccessToken, nil
 }
+
+func (c *CognitoClient) Logout(accessToken string) error {
+	logoutInput := &cognito.GlobalSignOutInput{
+		AccessToken: aws.String(accessToken),
+	}
+
+	_, err := c.cognitoClient.GlobalSignOut(logoutInput)
+	return err
+}

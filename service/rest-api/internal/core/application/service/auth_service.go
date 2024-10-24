@@ -18,3 +18,7 @@ func NewAuthService(authService in.AuthService) *AuthService {
 func (s *AuthService) SignIn(user domain.UserLogin) (string, error) {
 	return s.authService.SignIn(user)
 }
+
+func (s *AuthService) Logout(accessToken string) error {
+	return s.authService.Logout(accessToken)
+}

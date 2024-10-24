@@ -37,3 +37,17 @@ func (h *AuthHandler) SignIn(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, map[string]string{"access_token": token})
 }
+
+func (h *AuthHandler) Logout(c echo.Context) error {
+	accessToken := c.Request().Header.Get("Authorization")
+	if accessToken == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Authorization token required"})
+	}
+
+	err := h.service.Logout(accessToken)
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, map[string]string{"error": fmt.Sprintln(err)})
+	}
+
+	return c.JSON(http.StatusOK, map[string]string{"message": "Successfully logged out"})
+}
