@@ -16,3 +16,9 @@ type ClientResponse struct {
 	WorkSchedule WorkSchedule
 	Specialties  []Specialty
 }
+
+type ApplicantResponse struct {
+	Id           uuid.UUID
+	Name         string
+	EmailAddress string
+}

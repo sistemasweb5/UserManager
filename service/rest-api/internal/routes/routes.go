@@ -19,6 +19,10 @@ func RegisterRoutes(e *echo.Echo, conn *pgxpool.Pool) {
 	authService := service.NewAuthService(cognitoClient)
 	authHandler := adapter.NewAuthHandler(authService)
 
+	applicantRepo := repository.NewApplicantRepository(conn)
+	applicantService := service.NewApplicantService(applicantRepo)
+	applicantHandler := adapter.NewApplicantHandler(applicantService)
+
 	e.POST("/user/login", authHandler.SignIn)
 	e.GET("/user/id", authHandler.GetUserIdByToken)
 	e.POST("/user/logout", authHandler.Logout)
@@ -27,5 +31,6 @@ func RegisterRoutes(e *echo.Echo, conn *pgxpool.Pool) {
 
 	e.GET("/client", clientHandler.GetAllClients)
 	e.GET("/client/:id", clientHandler.GetClientById)
+	e.GET("/client/applicant", applicantHandler.GetAllApplicants)
 	e.POST("/client", clientHandler.CreateUser)
 }
