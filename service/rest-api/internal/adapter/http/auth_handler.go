@@ -1,6 +1,7 @@
 package adapter
 
 import (
+	"fmt"
 	"net/http"
 
 	"service/rest-api/internal/core/domain"
@@ -18,7 +19,8 @@ type CognitoInterface interface {
 }
 
 type AuthHandler struct {
-	service in.AuthService
+	service       in.AuthService
+	cognitoClient CognitoClient
 }
 
 func NewAuthHandler(s in.AuthService) *AuthHandler {
@@ -28,18 +30,15 @@ func NewAuthHandler(s in.AuthService) *AuthHandler {
 func (h *AuthHandler) SignIn(c echo.Context) error {
 	var user domain.UserLogin
 
-	// Bind the JSON request body to the UserLogin struct
 	if err := c.Bind(&user); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
 	}
 
-	// Call the service to authenticate the user
 	token, err := h.service.SignIn(user)
 	if err != nil {
-		return c.JSON(http.StatusUnauthorized, map[string]string{"error": "Invalid login credentials"})
+		return c.JSON(http.StatusUnauthorized, map[string]string{"error": "token:" + token + fmt.Sprintln(err) + h.cognitoClient.appClientID})
 	}
 
-	// Return the token as JSON response
 	return c.JSON(http.StatusOK, map[string]string{"access_token": token})
 }
 
@@ -74,7 +73,7 @@ func (c *CognitoClient) SignIn(user domain.UserLogin) (string, error) {
 
 	result, err := c.cognitoClient.InitiateAuth(authInput)
 	if err != nil {
-		return "", err
+		return c.appClientID, err
 	}
 	return *result.AuthenticationResult.AccessToken, nil
 }
