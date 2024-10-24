@@ -24,3 +24,6 @@ func (p *ClientService) GetById(id *uuid.UUID) (*domain.Client, error) {
 	return p.repo.GetById(id)
 }
 
+func (p *ClientService) Create(client *domain.Client) error {
+	return p.repo.Create(client)
+}

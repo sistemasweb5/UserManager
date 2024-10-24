@@ -9,4 +9,5 @@ import (
 type ClientRepository interface {
 	GetAll() (*[]domain.Client, error)
 	GetById(id *uuid.UUID) (*domain.Client, error)
+	Create(client *domain.Client) error
 }

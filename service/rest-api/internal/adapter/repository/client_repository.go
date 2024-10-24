@@ -35,7 +35,7 @@ func (r ClientRepository) GetAll() (*[]domain.Client, error) {
 		log.Printf("Error, could not create array: %v", err)
 		return nil, err
 	}
-	
+
 	return &array, nil
 }
 
@@ -44,8 +44,8 @@ func (r ClientRepository) GetById(id *uuid.UUID) (*domain.Client, error) {
 		SELECT * FROM client WHERE id = @clientId
 	`
 	args := pgx.NamedArgs{
-        "clientId": *id,
-    }
+		"clientId": *id,
+	}
 
 	var client domain.Client
 	err := r.db.queryRow(query, args).Scan(&client.Id, &client.Name, &client.EmailAddress, &client.CategoryId)
@@ -53,4 +53,24 @@ func (r ClientRepository) GetById(id *uuid.UUID) (*domain.Client, error) {
 		return nil, err
 	}
 	return &client, nil
+}
+
+func (r ClientRepository) Create(client *domain.Client) error {
+	query := `
+        INSERT INTO client (id, name, email_address, category_id) 
+        VALUES (@id, @name, @email_address, @category_id)
+    `
+	args := pgx.NamedArgs{
+		"id":            client.Id,
+		"name":          client.Name,
+		"email_address": client.EmailAddress,
+		"category_id":   client.CategoryId,
+	}
+
+	err := r.db.execute(query, args)
+	if err != nil {
+		log.Printf("Error, could not insert user: %v", err)
+		return err
+	}
+	return nil
 }
