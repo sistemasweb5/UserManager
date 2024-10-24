@@ -52,7 +52,7 @@ func SimpleRequest(postURL url.URL) (*http.Response, error) {
 	return resp, nil
 }
 
-func SimplePostRequest(postURL url.URL, data interface{}) (*http.Response, error) {
+func SimplePostRequest(postURL url.URL, data interface{}, token string) (*http.Response, error) {
 	log.Printf("Processing POST request: %s", postURL.String())
 
 	body, err := json.Marshal(data)
@@ -61,7 +61,19 @@ func SimplePostRequest(postURL url.URL, data interface{}) (*http.Response, error
 		return nil, err
 	}
 
-	resp, err := http.Post(postURL.String(), "application/json", bytes.NewBuffer(body))
+	req, err := http.NewRequest("POST", postURL.String(), bytes.NewBuffer(body))
+	if err != nil {
+		log.Printf("Error creating HTTP request: %v", err)
+		return nil, err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	if token != "" {
+		req.Header.Set("Authorization", "Bearer "+token)
+	}
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
 	if err != nil {
 		log.Printf("An error occurred during processing: %v", err)
 		return nil, err
