@@ -69,7 +69,6 @@ func SimplePostRequest(postURL url.URL, data interface{}, token string) (*http.R
 
 	req.Header.Set("Content-Type", "application/json")
 	if token != "" {
-		log.Println(token)
 		req.Header.Set("Authorization", "Bearer "+token)
 	}
 
