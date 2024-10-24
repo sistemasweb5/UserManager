@@ -9,6 +9,8 @@ require (
 )
 
 require (
+	github.com/jmespath/go-jmespath v0.4.0 // indirect
+	github.com/aws/aws-sdk-go v1.55.5 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/labstack/gommon v0.4.2 // indirect

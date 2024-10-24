@@ -29,6 +29,9 @@ services:
     environment:
       #urlExample := "postgres://username:password@localhost:5432/database_name"
       DATABASE_URL: "postgres://phaeton:ecliptic@helios-db:5432/helios"
+      AWS_REGION: ${AWS_REGION}
+      COGNITO_APP_CLIENT_ID: ${COGNITO_APP_CLIENT_ID}
+      COGNITO_USER_POOL_ID: ${COGNITO_USER_POOL_ID}
     depends_on:
       - helios-db
 
