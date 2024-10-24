@@ -18,9 +18,9 @@ func NewClientHandler(s in.ClientService) ClientHandler {
 }
 
 func (handler *ClientHandler) GetAllClients(context echo.Context) error {
-	clients, err := handler.service.GetAll()
+	clients, err := handler.service.GetAll(context.Request().Context())
 	if err != nil {
-		log.Printf("Could not get all clients: %v", err)
+		log.Printf("Error: %v", err)
 
 		return context.JSON(http.StatusInternalServerError, map[string]string{
 			"message": "Unable to retrieve clients",
@@ -36,7 +36,7 @@ func (handler *ClientHandler) GetClientById(context echo.Context) error {
 		return err
 	}
 
-	client, err := handler.service.GetById(&id)
+	client, err := handler.service.GetById(context.Request().Context(), &id, )
 	if err != nil {
 		log.Printf("Could not get client: %v", err)
 		return err

@@ -7,17 +7,6 @@ import (
 	"net/url"
 )
 
-type Client struct {
-	Id           string
-	Name         string
-	EmailAddress string
-	CategoryId   string
-}
-
-type Category struct {
-	Id  string
-	Rol string
-}
 
 type ClientTest struct {
 	Address url.URL

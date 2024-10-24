@@ -6,11 +6,6 @@ import (
 	"net/url"
 )
 
-type UserLogin struct {
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required"`
-}
-
 type AuthTest struct {
 	Address url.URL
 }
