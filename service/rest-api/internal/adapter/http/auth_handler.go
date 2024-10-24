@@ -3,6 +3,7 @@ package adapter
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"service/rest-api/internal/core/domain"
 	"service/rest-api/internal/port/in"
@@ -38,7 +39,7 @@ func (h *AuthHandler) SignIn(c echo.Context) error {
 }
 
 func (h *AuthHandler) Logout(c echo.Context) error {
-	accessToken := c.Request().Header.Get("Authorization")
+	accessToken := strings.TrimPrefix(c.Request().Header.Get("Authorization"), "Bearer ")
 	if accessToken == "" {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Authorization token required"})
 	}
