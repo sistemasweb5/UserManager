@@ -11,8 +11,7 @@ import (
 )
 
 type AuthHandler struct {
-	service       in.AuthService
-	cognitoClient CognitoClient
+	service in.AuthService
 }
 
 func NewAuthHandler(s in.AuthService) *AuthHandler {
@@ -31,7 +30,7 @@ func (h *AuthHandler) SignIn(c echo.Context) error {
 		return c.JSON(
 			http.StatusUnauthorized,
 			map[string]string{
-				"error": "token:" + token + fmt.Sprintln(err) + h.cognitoClient.appClientID,
+				"error": "token:" + token + fmt.Sprintln(err),
 			})
 	}
 

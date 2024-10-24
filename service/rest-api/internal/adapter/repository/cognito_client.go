@@ -1,4 +1,4 @@
-package adapter
+package repository
 
 import (
 	"service/rest-api/internal/core/domain"

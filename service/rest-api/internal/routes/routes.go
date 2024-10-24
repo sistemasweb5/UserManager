@@ -15,7 +15,7 @@ func RegisterRoutes(e *echo.Echo, conn *pgxpool.Pool) {
 	clientService := service.NewClientService(clientRepo)
 	clientHandler := adapter.NewClientHandler(clientService)
 
-	cognitoClient := adapter.NewCognitoClient(os.Getenv("COGNITO_APP_CLIENT_ID"))
+	cognitoClient := repository.NewCognitoClient(os.Getenv("COGNITO_APP_CLIENT_ID"))
 	authService := service.NewAuthService(cognitoClient)
 	authHandler := adapter.NewAuthHandler(authService)
 
