@@ -2,11 +2,12 @@ package endpoints_test
 
 import (
 	"api/testing/endpoints"
+	"os"
 	"testing"
 )
 
 func TestGetAllApplicants(t *testing.T) {
-	url := "localhost:8080"
+	url := os.Getenv("USER_MANAGER_HOSTNAME")
 	endpoint := endpoints.NewApplicantTest(&url)
 	resp, err := endpoint.GetAll()
 	defer resp.Body.Close()

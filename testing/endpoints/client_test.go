@@ -11,9 +11,10 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/joho/godotenv"
 )
 
-func setup() {
+func databaseSetup() {
 	conn, err := pgx.Connect(context.Background(), os.Getenv("TEST_DATABASE_URL"))
 	if err != nil {
 		log.Fatalf("Unable to connect to database: %v", err)
@@ -65,13 +66,18 @@ func setup() {
 
 func TestMain(m *testing.M) {
 	log.SetFlags(log.Lshortfile)
-	setup()
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	databaseSetup()
 	code := m.Run()
 	os.Exit(code)
 }
 
 func TestGetAll(t *testing.T) {
-	url := "localhost:5200"
+	url := os.Getenv("USER_MANAGER_HOSTNAME")
 	client := endpoints.NewClientTest(&url)
 	resp, err := client.GetAll()
 	defer resp.Body.Close()
@@ -86,7 +92,7 @@ func TestGetAll(t *testing.T) {
 }
 
 func TestGetById(t *testing.T) {
-	url := "localhost:5200"
+	url := os.Getenv("USER_MANAGER_HOSTNAME")
 	clientEndpoint := endpoints.NewClientTest(&url)
 
 	respClients, err := clientEndpoint.GetAll()
@@ -116,7 +122,7 @@ func TestGetById(t *testing.T) {
 }
 
 func TestFetchInvalidId(t *testing.T) {
-	url := "localhost:5200"
+	url := os.Getenv("USER_MANAGER_HOSTNAME")
 	clientEndpoint := endpoints.NewClientTest(&url)
 	invalidID := "00000000-0000-0000-0000-000000000000"
 	resp, err := clientEndpoint.GetById(invalidID)
