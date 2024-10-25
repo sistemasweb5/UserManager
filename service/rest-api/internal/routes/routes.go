@@ -22,6 +22,10 @@ func RegisterRoutes(e *echo.Echo, conn *pgxpool.Pool) {
 	e.POST("/user/login", authHandler.SignIn)
 	e.GET("/user/id", authHandler.GetUserIdByToken)
 	e.POST("/user/logout", authHandler.Logout)
+	e.POST("/user/signup", authHandler.SignUp)
+	e.POST("/user/confirm", authHandler.ConfirmAccount)
+
 	e.GET("/client", clientHandler.GetAllClients)
 	e.GET("/client/:id", clientHandler.GetClientById)
+	e.POST("/client", clientHandler.CreateUser)
 }

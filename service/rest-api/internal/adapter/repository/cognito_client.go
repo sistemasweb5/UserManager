@@ -53,6 +53,41 @@ func (c *CognitoClient) Logout(accessToken string) error {
 	return err
 }
 
+func (c *CognitoClient) SignUp(user domain.UserSignUp) (string, error) {
+	signUpInput := &cognito.SignUpInput{
+		ClientId: aws.String(c.appClientID),
+		Username: aws.String(user.Email),
+		Password: aws.String(user.Password),
+		UserAttributes: []*cognito.AttributeType{
+			{
+				Name:  aws.String("name"),
+				Value: aws.String(user.Name),
+			},
+			{
+				Name:  aws.String("email"),
+				Value: aws.String(user.Email),
+			},
+		},
+	}
+
+	_, err := c.cognitoClient.SignUp(signUpInput)
+	if err != nil {
+		return c.appClientID, err
+	}
+	return "User Created Succesfully", nil
+}
+
+func (c *CognitoClient) ConfirmAccount(confirmation domain.UserConfirmation) error {
+	confirmInput := &cognito.ConfirmSignUpInput{
+		ClientId:         aws.String(c.appClientID),
+		Username:         aws.String(confirmation.Email),
+		ConfirmationCode: aws.String(confirmation.Code),
+	}
+
+	_, err := c.cognitoClient.ConfirmSignUp(confirmInput)
+	return err
+}
+
 func (c *CognitoClient) GetUserIdByToken(accessToken string) (string, error) {
 	getUserInput := &cognito.GetUserInput{
 		AccessToken: aws.String(accessToken),

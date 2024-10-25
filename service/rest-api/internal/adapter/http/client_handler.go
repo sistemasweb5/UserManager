@@ -3,6 +3,7 @@ package adapter
 import (
 	"log"
 	"net/http"
+	"service/rest-api/internal/core/domain"
 	"service/rest-api/internal/port/in"
 
 	"github.com/google/uuid"
@@ -43,4 +44,19 @@ func (handler *ClientHandler) GetClientById(context echo.Context) error {
 	}
 
 	return context.JSON(http.StatusOK, client)
+}
+
+func (handler *ClientHandler) CreateUser(c echo.Context) error {
+	var user domain.Client
+
+	if err := c.Bind(&user); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
+	}
+
+	client, err := handler.service.CreateUser(c.Request().Context(), user)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, client)
 }

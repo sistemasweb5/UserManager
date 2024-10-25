@@ -23,6 +23,14 @@ func (s *AuthService) Logout(accessToken string) error {
 	return s.authService.Logout(accessToken)
 }
 
+func (s *AuthService) SignUp(user domain.UserSignUp) (string, error) {
+	return s.authService.SignUp(user)
+}
+
+func (s *AuthService) ConfirmAccount(user domain.UserConfirmation) error {
+	return s.authService.ConfirmAccount(user)
+}
+
 func (s *AuthService) GetUserIdByToken(accessToken string) (string, error) {
 	return s.authService.GetUserIdByToken(accessToken)
 }
