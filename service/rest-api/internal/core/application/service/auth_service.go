@@ -22,3 +22,7 @@ func (s *AuthService) SignIn(user domain.UserLogin) (string, error) {
 func (s *AuthService) Logout(accessToken string) error {
 	return s.authService.Logout(accessToken)
 }
+
+func (s *AuthService) GetUserIdByToken(accessToken string) (string, error) {
+	return s.authService.GetUserIdByToken(accessToken)
+}

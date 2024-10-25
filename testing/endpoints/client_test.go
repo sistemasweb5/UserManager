@@ -28,9 +28,9 @@ func setup() {
 	userId := uuid.NewString()
 	workScheduleId := uuid.NewString()
 	client := endpoints.Client{
-		Id:             userId,
+		Id:             "917b9550-0031-70a4-0e12-6f5b45aed3f5",
 		Name:           "Slim shady",
-		EmailAddress:   "fake_email@mail.com",
+		EmailAddress:   "test@mail.com",
 		CategoryId:     categoryId,
 		WorkScheduleId: workScheduleId,
 	}
@@ -44,8 +44,8 @@ func setup() {
 		EndTime:   "17.00",
 	}
 	specialty := endpoints.Specialty{
-		Id:     categoryId,
-		Name:   "Plumber",
+		Id:       categoryId,
+		Name:     "Plumber",
 		ClientId: userId,
 	}
 

@@ -36,7 +36,7 @@ func (handler *ClientHandler) GetClientById(context echo.Context) error {
 		return err
 	}
 
-	client, err := handler.service.GetById(context.Request().Context(), &id, )
+	client, err := handler.service.GetById(context.Request().Context(), &id)
 	if err != nil {
 		log.Printf("Could not get client: %v", err)
 		return err

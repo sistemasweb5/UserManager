@@ -9,6 +9,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	pgxUUID "github.com/vgarvardt/pgx-google-uuid/v5"
 )
 
@@ -30,6 +31,11 @@ func main() {
 
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	e := echo.New()
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"http://localhost:5173"},
+		AllowMethods: []string{echo.GET, echo.POST, echo.PUT, echo.DELETE},
+	}))
+
 	routes.RegisterRoutes(e, pgxConnPool)
 	if err := e.Start(":8080"); err != nil {
 		log.Fatalf("Could not start api: %v", e)
