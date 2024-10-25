@@ -51,3 +51,33 @@ func (h *AuthHandler) Logout(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, map[string]string{"message": "Successfully logged out"})
 }
+
+func (h *AuthHandler) SignUp(c echo.Context) error {
+	var user domain.UserSignUp
+
+	if err := c.Bind(&user); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
+	}
+
+	userID, err := h.service.SignUp(user)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, map[string]string{"user_id": userID})
+}
+
+func (h *AuthHandler) ConfirmAccount(c echo.Context) error {
+	var confirmation domain.UserConfirmation
+
+	if err := c.Bind(&confirmation); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
+	}
+
+	err := h.service.ConfirmAccount(confirmation)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, map[string]string{"message": "Account confirmed"})
+}
