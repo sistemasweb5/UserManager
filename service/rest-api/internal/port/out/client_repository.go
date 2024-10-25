@@ -13,4 +13,5 @@ type ClientRepository interface {
 	GetCategoryById(ctx context.Context, id *uuid.UUID) (*domain.Category, error)
 	GetWorkScheduleById(ctx context.Context, id *uuid.UUID) (*domain.WorkSchedule, error)
 	GetSpecialitiesByClientId(ctx context.Context, id *uuid.UUID) (*[]domain.Specialty, error)
+	CreateUser(ctx context.Context, user domain.Client) (*domain.ClientResponse, error)
 }

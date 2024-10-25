@@ -22,3 +22,11 @@ func (s *AuthService) SignIn(user domain.UserLogin) (string, error) {
 func (s *AuthService) Logout(accessToken string) error {
 	return s.authService.Logout(accessToken)
 }
+
+func (s *AuthService) SignUp(user domain.UserSignUp) (string, error) {
+	return s.authService.SignUp(user)
+}
+
+func (s *AuthService) ConfirmAccount(user domain.UserConfirmation) error {
+	return s.authService.ConfirmAccount(user)
+}
