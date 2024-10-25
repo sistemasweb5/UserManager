@@ -110,3 +110,48 @@ func (r ClientRepository) GetSpecialitiesByClientId(ctx context.Context, id *uui
 
 	return &array, nil
 }
+
+func (r ClientRepository) CreateUser(ctx context.Context, user domain.Client) (*domain.ClientResponse, error) {
+	query := `
+		INSERT INTO client (id, name, emailAddress, categoryId, workScheduleId)
+		VALUES ($1, $2, $3, $4, $5)
+		RETURNING id, name, emailAddress, categoryId, workScheduleId
+	`
+	newId := uuid.New()
+
+	var client domain.Client
+	err := r.db.QueryRow(
+		ctx, query, newId, user.Name, user.EmailAddress, user.CategoryId, user.WorkScheduleId).Scan(
+		&client.Id, &client.Name, &client.EmailAddress, &client.CategoryId, &client.WorkScheduleId)
+	if err != nil {
+		log.Printf("Error: %v", err)
+		return nil, err
+	}
+
+	category, err := r.GetCategoryById(ctx, &user.CategoryId)
+	if err != nil {
+		log.Printf("Error fetching category: %v", err)
+		return nil, err
+	}
+
+	workSchedule, err := r.GetWorkScheduleById(ctx, &user.WorkScheduleId)
+	if err != nil {
+		log.Printf("Error fetching work schedule: %v", err)
+		return nil, err
+	}
+
+	specialties, err := r.GetSpecialitiesByClientId(ctx, &newId)
+	if err != nil {
+		log.Printf("Error fetching specialties: %v", err)
+		return nil, err
+	}
+
+	clientResponse := &domain.ClientResponse{
+		Client:       client,
+		Category:     *category,
+		WorkSchedule: *workSchedule,
+		Specialties:  *specialties,
+	}
+
+	return clientResponse, nil
+}

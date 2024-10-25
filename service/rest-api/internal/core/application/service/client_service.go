@@ -66,3 +66,7 @@ func (p *ClientService) GetById(ctx context.Context, id *uuid.UUID) (*domain.Cli
 		Specialties:  *specialties,
 	}, nil
 }
+
+func (p *ClientService) CreateUser(ctx context.Context, user domain.Client) (*domain.ClientResponse, error) {
+	return p.repo.CreateUser(ctx, user)
+}
