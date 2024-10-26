@@ -27,6 +27,6 @@ CREATE TABLE client (
     name VARCHAR NOT NULL,
     emailAddress VARCHAR NOT NULL,
     categoryId UUID NOT NULL,
-    workScheduleId UUID NOT NULL,
+    workScheduleId UUID NULL,
     CONSTRAINT client_pk PRIMARY KEY (id)
 );

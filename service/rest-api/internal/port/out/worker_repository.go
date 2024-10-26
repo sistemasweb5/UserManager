@@ -7,10 +7,10 @@ import (
 	"github.com/google/uuid"
 )
 
-// Deprecated: Use CategoryRepository, WorkerRepository and ApplicantRepository instead.
-type ClientRepository interface {
-	GetClientById(ctx context.Context, id *uuid.UUID) (*domain.Client, error)
-	GetCategoryById(ctx context.Context, id *uuid.UUID) (*domain.Category, error)
+type WorkerRepository interface {
+	GetAllWorkers(ctx context.Context) (*[]domain.Worker, error)
+	GetWorkerById(ctx context.Context, id *uuid.UUID) (*domain.Worker, error)
 	GetWorkScheduleById(ctx context.Context, id *uuid.UUID) (*domain.WorkSchedule, error)
 	GetSpecialitiesByClientId(ctx context.Context, id *uuid.UUID) (*[]domain.Specialty, error)
+	CreateWorker(ctx context.Context, user domain.WorkerRequest) (*uuid.UUID, error)
 }

@@ -11,25 +11,40 @@ import (
 )
 
 type ClientHandler struct {
-	service in.ClientService
+	applicantService in.ApplicantService
+	workerService    in.WorkerService
+	categoryService  in.CategoryService
+	clientService    in.ClientService
 }
 
-func NewClientHandler(s in.ClientService) ClientHandler {
-	return ClientHandler{service: s}
+func NewClientHandler(
+	applicant in.ApplicantService,
+	worker in.WorkerService,
+	category in.CategoryService,
+	client in.ClientService,
+) ClientHandler {
+	return ClientHandler{
+		applicantService: applicant,
+		workerService:    worker,
+		categoryService:  category,
+		clientService:    client,
+	}
 }
 
-func (handler *ClientHandler) GetAllClients(context echo.Context) error {
-	clients, err := handler.service.GetAll(context.Request().Context())
+func (handler *ClientHandler) GetAllCategory(context echo.Context) error {
+	items, err := handler.categoryService.GetAllCategory(context.Request().Context())
 	if err != nil {
 		log.Printf("Error: %v", err)
 
 		return context.JSON(http.StatusInternalServerError, map[string]string{
-			"message": "Unable to retrieve clients",
+			"message": "Unable to retrieve category",
 		})
 	}
-	return context.JSON(http.StatusOK, clients)
+	return context.JSON(http.StatusOK, items)
 }
 
+// Deprecated: This endpoint could return null WorkSchedule.
+// Use GetApplicantById or GetWorkerById instead.
 func (handler *ClientHandler) GetClientById(context echo.Context) error {
 	id, err := uuid.Parse(context.Param("id"))
 	if err != nil {
@@ -37,7 +52,7 @@ func (handler *ClientHandler) GetClientById(context echo.Context) error {
 		return err
 	}
 
-	client, err := handler.service.GetById(context.Request().Context(), &id)
+	client, err := handler.clientService.GetById(context.Request().Context(), &id)
 	if err != nil {
 		log.Printf("Could not get client: %v", err)
 		return err
@@ -46,14 +61,84 @@ func (handler *ClientHandler) GetClientById(context echo.Context) error {
 	return context.JSON(http.StatusOK, client)
 }
 
-func (handler *ClientHandler) CreateUser(c echo.Context) error {
-	var user domain.Client
+func (handler *ClientHandler) GetAllApplicant(context echo.Context) error {
+	items, err := handler.applicantService.GetAllApplicant(context.Request().Context())
+	if err != nil {
+		log.Printf("Error: %v", err)
+
+		return context.JSON(http.StatusInternalServerError, map[string]string{
+			"message": "Unable to retrieve clients",
+		})
+	}
+	return context.JSON(http.StatusOK, items)
+}
+
+func (handler *ClientHandler) GetAllWorker(context echo.Context) error {
+	items, err := handler.workerService.GetAllWorker(context.Request().Context())
+	if err != nil {
+		log.Panic("Error: %v", err)
+
+		return context.JSON(http.StatusInternalServerError, map[string]string{
+			"message": "Unable to retrieve clients",
+		})
+	}
+	return context.JSON(http.StatusOK, items)
+}
+
+func (handler *ClientHandler) GetWorkerById(context echo.Context) error {
+	id, err := uuid.Parse(context.Param("id"))
+	if err != nil {
+		log.Printf("Could not parse id: %v", err)
+		return err
+	}
+
+	client, err := handler.workerService.GetWorkerById(context.Request().Context(), &id)
+	if err != nil {
+		log.Printf("Could not get client: %v", err)
+		return err
+	}
+
+	return context.JSON(http.StatusOK, client)
+}
+
+func (handler *ClientHandler) GetApplicantById(context echo.Context) error {
+	id, err := uuid.Parse(context.Param("id"))
+	if err != nil {
+		log.Printf("Could not parse id: %v", err)
+		return err
+	}
+
+	client, err := handler.applicantService.GetApplicantById(context.Request().Context(), &id)
+	if err != nil {
+		log.Printf("Could not get client: %v", err)
+		return err
+	}
+
+	return context.JSON(http.StatusOK, client)
+}
+
+func (handler *ClientHandler) CreateApplicant(c echo.Context) error {
+	var user domain.ApplicantRequest
+	if err := c.Bind(&user); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
+	}
+
+	client, err := handler.applicantService.CreateApplicant(c.Request().Context(), user)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, client)
+}
+
+func (handler *ClientHandler) CreateWorker(c echo.Context) error {
+	var user domain.WorkerRequest
 
 	if err := c.Bind(&user); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid request"})
 	}
 
-	client, err := handler.service.CreateUser(c.Request().Context(), user)
+	client, err := handler.workerService.CreateWorker(c.Request().Context(), user)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
 	}

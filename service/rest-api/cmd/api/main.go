@@ -4,8 +4,11 @@ import (
 	"context"
 	"log"
 	"os"
+	"service/rest-api/internal/adapter/repository"
+	"service/rest-api/internal/core/domain"
 	"service/rest-api/internal/routes"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/labstack/echo/v4"
@@ -13,7 +16,32 @@ import (
 	pgxUUID "github.com/vgarvardt/pgx-google-uuid/v5"
 )
 
-func main() {
+func populateCategories(ctx context.Context, db *pgxpool.Pool) (uuid.UUID, uuid.UUID, error) {
+	categoryRepo := repository.NewCategoryRepository(db)
+
+	workerCategoryId := uuid.New()
+	applicantCategoryId := uuid.New()
+
+	err := categoryRepo.InsertCategory(ctx, &domain.Category{
+		Id:  applicantCategoryId,
+		Rol: "applicant",
+	})
+	if err != nil {
+		log.Fatalf("ERROR: Could not initialize database: %v", err)
+	}
+	
+	err = categoryRepo.InsertCategory(ctx, &domain.Category{
+		Id:  workerCategoryId,
+		Rol: "worker",
+	})
+	if err != nil {
+		log.Fatalf("ERROR: Could not initialize database: %v", err)
+	}
+
+	return workerCategoryId, applicantCategoryId, nil
+}
+
+func setupDB() *pgxpool.Pool {
 	pgxConfig, err := pgxpool.ParseConfig(os.Getenv("DATABASE_URL"))
 	if err != nil {
 		log.Fatalf("Unable to connect to database: %v", err)
@@ -29,6 +57,11 @@ func main() {
 		log.Fatalf("Unable to connect to database: %v", err)
 	}
 
+	return pgxConnPool
+}
+
+func main() {
+	pgxConnPool := setupDB()
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 	e := echo.New()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{

@@ -17,6 +17,6 @@ func TestGetAllApplicants(t *testing.T) {
 
 	statusCode := resp.StatusCode
 	if !(statusCode >= 200 && statusCode <= 299) {
-		t.Errorf("Endpoint %s has failed", endpoint.Address.String())
+		t.Errorf("Response status code outside expected range\nStatus code: %d", statusCode)
 	}
 }
