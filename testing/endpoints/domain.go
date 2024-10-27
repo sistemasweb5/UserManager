@@ -1,23 +1,21 @@
 package endpoints
 
-type Client struct {
-	Id             string
-	Name           string
-	EmailAddress   string
-	CategoryId     string
-	WorkScheduleId string
+type Applicant struct {
+	Id           string
+	Name         string
+	EmailAddress string
+	CategoryId   string
+}
+
+type ApplicantResponse struct {
+	Id           string
+	Name         string
+	EmailAddress string
 }
 
 type Category struct {
 	Id  string
 	Rol string
-}
-
-type ClientResponse struct {
-	Client       Client
-	Category     Category
-	WorkSchedule WorkSchedule
-	Specialties  []Specialty
 }
 
 type WorkSchedule struct {
@@ -35,4 +33,31 @@ type Specialty struct {
 type UserLogin struct {
 	Email    string `json:"email" binding:"required,email"`
 	Password string `json:"password" binding:"required"`
+}
+
+type WorkerResponse struct {
+	Id           string
+	Name         string
+	EmailAddress string
+	WorkSchedule WorkSchedule
+	Specialties  []Specialty
+}
+
+type Worker struct {
+	Id             string
+	Name           string
+	EmailAddress   string
+	CategoryId     string
+	WorkScheduleId string
+}
+
+type ApplicantRequest struct {
+	Name         string
+	EmailAddress string
+}
+
+type WorkerRequest struct {
+	Name           string
+	EmailAddress   string
+	WorkScheduleId string
 }

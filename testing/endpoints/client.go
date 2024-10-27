@@ -2,42 +2,39 @@ package endpoints
 
 import (
 	"api/testing/petitions"
-	"log"
 	"net/http"
 	"net/url"
 )
 
-
-type ClientTest struct {
+type UserTest struct {
 	Address url.URL
 }
 
-func (b ClientTest) GetAll() (*http.Response, error) {
+func (b UserTest) GetAllApplicant() (*http.Response, error) {
+	b.Address.Path = "client/applicant"
 	return petitions.SimpleRequest(b.Address)
 }
 
-func (b ClientTest) GetById(id string) (*http.Response, error) {
+func (b UserTest) GetAllWorker() (*http.Response, error) {
+	b.Address.Path = "client/worker"
+	return petitions.SimpleRequest(b.Address)
+}
+
+func (b UserTest) GetById(id string) (*http.Response, error) {
 	b.Address.Path = "client/" + id
 	return petitions.SimpleRequest(b.Address)
 }
 
-func NewClientTest(baseUrl *string) *ClientTest {
+func NewClientTest(baseUrl *string) *UserTest {
 	address := url.URL{
 		Scheme: "http",
 		Host:   *baseUrl,
-		Path:   "client",
+		Path:   "user/",
 	}
 
-	client := ClientTest{
+	client := UserTest{
 		Address: address,
 	}
 
 	return &client
-}
-
-func InitClient(baseUrl *string) {
-	client := NewClientTest(baseUrl)
-	log.Printf("Testing client endpoints")
-	client.GetAll()
-	client.GetById("aaaaaaaa-1111-1111-1111-111111111111")
 }

@@ -21,14 +21,12 @@ func TestAuthHandler_SignIn_Success(t *testing.T) {
 		"password": "Pass@1234123",
 	}
 
-	resp, err := h.SignIn(&data)
+	statusCode, _, err := h.SignIn(&data)
 
-	defer resp.Body.Close()
 	if err != nil {
 		t.Errorf(fmt.Sprintln(err))
 	}
 
-	statusCode := resp.StatusCode
 	if !(statusCode >= 200 && statusCode <= 299) {
 		t.Errorf("Endpoint %s has failed", fmt.Sprintln(err))
 	}

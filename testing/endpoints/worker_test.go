@@ -4,34 +4,32 @@ import (
 	"api/testing/endpoints"
 	"encoding/json"
 	"io"
-	"log"
 	"os"
 	"testing"
 )
 
-func TestGetAllApplicant(t *testing.T) {
+func TestGetAllWorker(t *testing.T) {
 	url := os.Getenv("USER_MANAGER_HOSTNAME")
-	endpoint := endpoints.NewApplicantTest(&url)
-	resp, err := endpoint.GetAllApplicant()
+	endpoint := endpoints.NewWorkerTest(&url)
+	resp, err := endpoint.GetAllWorkers()
 	defer resp.Body.Close()
 	if err != nil {
 		t.Errorf("Could not reach endpoint %s", endpoint.Address.String())
 	}
-
 	endpoints.Helper(t, resp)
 }
 
-func TestGetAllApplicantIsNotEmpty(t *testing.T) {
+func TestGetAllWorkerIsNotEmpty(t *testing.T) {
 	url := os.Getenv("USER_MANAGER_HOSTNAME")
-	endpoint := endpoints.NewApplicantTest(&url)
+	clientEndpoint := endpoints.NewClientTest(&url)
 
-	respClients, err := endpoint.GetAllApplicant()
+	respClients, err := clientEndpoint.GetAllWorker()
 	defer respClients.Body.Close()
 	body, err := io.ReadAll(respClients.Body)
 	if err != nil {
 		t.Errorf("Error: %v", err)
 	}
-	var workers []endpoints.ApplicantResponse
+	var workers []endpoints.WorkerResponse
 	if err := json.Unmarshal(body, &workers); err != nil {
 		t.Errorf("Error: %v", err)
 	}
@@ -41,41 +39,40 @@ func TestGetAllApplicantIsNotEmpty(t *testing.T) {
 	}
 }
 
-func TestGetApplicantById(t *testing.T) {
+func TestGetWorkerById(t *testing.T) {
 	url := os.Getenv("USER_MANAGER_HOSTNAME")
-	endpoint := endpoints.NewApplicantTest(&url)
+	clientEndpoint := endpoints.NewWorkerTest(&url)
 
-	respClients, err := endpoint.GetAllApplicant()
+	respClients, err := clientEndpoint.GetAllWorkers()
 	defer respClients.Body.Close()
 	body, err := io.ReadAll(respClients.Body)
 	if err != nil {
 		t.Errorf("Error: %v", err)
 	}
-	var array []endpoints.ApplicantResponse
-	if err := json.Unmarshal(body, &array); err != nil {
+	var workers []endpoints.WorkerResponse
+	if err := json.Unmarshal(body, &workers); err != nil {
 		t.Errorf("Error: %v", err)
 	}
-	if len(array) < 1 {
+	if len(workers) < 1 {
 		t.Error("Response body is empty")
 	}
-	item := array[0]
+	worker := workers[0]
 
-	resp, err := endpoint.GetApplicantById(item.Id)
+	resp, err := clientEndpoint.GetWorkerById(worker.Id)
 	defer resp.Body.Close()
 	if err != nil {
-		t.Errorf("Could not reach endpoint %s", endpoint.Address.String())
+		t.Errorf("Could not reach endpoint %s", clientEndpoint.Address.String())
 	}
 	statusCode := resp.StatusCode
 	if !(statusCode >= 200 && statusCode <= 299) {
 		t.Errorf("Response status code outside expected range\nStatus code: %d", statusCode)
-		log.Print(array)
 	}
 }
 
-func TestPostApplicant(t *testing.T){
+func TestPostWorker(t *testing.T){
 	url := os.Getenv("USER_MANAGER_HOSTNAME")
-	endpoint := endpoints.NewApplicantTest(&url)
-	resp, err := endpoint.PostApplicant("3c89fd37-0976-4afc-846d-d87cd4b589b0")
+	endpoint := endpoints.NewWorkerTest(&url)
+	resp, err := endpoint.PostWorker("3c89fd37-0976-4afc-846d-d87cd4b589b0")
 	defer resp.Body.Close()
 	if err != nil {
 		t.Errorf("Could not reach endpoint %s", endpoint.Address.String())
