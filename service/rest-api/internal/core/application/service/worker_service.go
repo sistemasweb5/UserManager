@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"log"
 	"service/rest-api/internal/core/domain"
 	"service/rest-api/internal/port/in"
 	"service/rest-api/internal/port/out"
@@ -29,6 +30,7 @@ func (w WorkerService) GetAllWorker(ctx context.Context) (*[]domain.WorkerRespon
 	for _, worker := range *workers {
 		workerResponse, err := w.GetWorkerById(ctx, &worker.Id)
 		if err != nil {
+			log.Printf("Error: %v", err)
 			return nil, err
 		}
 		workerResponses = append(workerResponses, *workerResponse)
@@ -40,16 +42,19 @@ func (w WorkerService) GetAllWorker(ctx context.Context) (*[]domain.WorkerRespon
 func (w WorkerService) GetWorkerById(ctx context.Context, id *uuid.UUID) (*domain.WorkerResponse, error) {
 	worker, err := w.workerRepo.GetWorkerById(ctx, id)
 	if err != nil {
+		log.Printf("Error: %v", err)
 		return nil, err
 	}
 
 	schedule, err := w.workerRepo.GetWorkScheduleById(ctx, &worker.WorkScheduleId)
 	if err != nil {
+		log.Printf("Error: %v", err)
 		return nil, err
 	}
 
 	specialties, err := w.workerRepo.GetSpecialitiesByClientId(ctx, &worker.Id)
 	if err != nil {
+		log.Printf("Error: %v", err)
 		return nil, err
 	}
 

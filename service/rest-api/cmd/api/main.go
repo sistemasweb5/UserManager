@@ -29,7 +29,7 @@ func populateCategories(ctx context.Context, db *pgxpool.Pool) (uuid.UUID, uuid.
 	if err != nil {
 		log.Fatalf("ERROR: Could not initialize database: %v", err)
 	}
-	
+
 	err = categoryRepo.InsertCategory(ctx, &domain.Category{
 		Id:  workerCategoryId,
 		Rol: "worker",
@@ -51,6 +51,7 @@ func setupDB() *pgxpool.Pool {
 		pgxUUID.Register(conn.TypeMap())
 		return nil
 	}
+
 
 	pgxConnPool, err := pgxpool.NewWithConfig(context.Background(), pgxConfig)
 	if err != nil {

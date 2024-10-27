@@ -2,6 +2,7 @@ package routes
 
 import (
 	"context"
+	"log"
 	"os"
 	adapter "service/rest-api/internal/adapter/http"
 	"service/rest-api/internal/adapter/repository"
@@ -13,7 +14,10 @@ import (
 )
 
 func RegisterRoutes(e *echo.Echo, conn *pgxpool.Pool) {
-	clientHandler := setupClientService(context.TODO(), conn)
+	clientHandler, err := setupClientService(context.TODO(), conn)
+	if err != nil {
+		log.Fatalf("Could not startup: %v", err)
+	}
 
 	cognitoClient := repository.NewCognitoClient(os.Getenv("COGNITO_APP_CLIENT_ID"))
 	authService := service.NewAuthService(cognitoClient)
@@ -36,34 +40,33 @@ func RegisterRoutes(e *echo.Echo, conn *pgxpool.Pool) {
 	e.POST("/client/applicant", clientHandler.CreateApplicant)
 }
 
-func setupClientService(ctx context.Context, conn *pgxpool.Pool) adapter.ClientHandler {
-	applicantCategoryId, _ := uuid.Parse("03619b71-e334-4db9-a1e9-f450d3854b61")
-	workerCategoryId, _ := uuid.Parse("367a2064-9b0a-4d77-ab29-1410cb8f84ec")
-
+func setupClientService(ctx context.Context, conn *pgxpool.Pool) (adapter.ClientHandler, error) {
 	categoryRepo := repository.NewCategoryRepository(conn)
-	applicantRepo := repository.NewApplicantRepository(conn, &applicantCategoryId)
-	workerRepo := repository.NewWorkerRepository(conn, workerCategoryId)
-	clientRepo := repository.NewClientRepository(conn)
-
-	// err := categoryRepo.InsertCategory(ctx, &domain.Category{
-	// 	Id:  applicantCategoryId,
-	// 	Rol: "applicant",
-	// })
-	// if err != nil {
-	// 	log.Fatalf("ERROR: Could not initialize database: %v", err)
-	// }
-	// err = categoryRepo.InsertCategory(ctx, &domain.Category{
-	// 	Id:  workerCategoryId,
-	// 	Rol: "worker",
-	// })
-	// if err != nil {
-	// 	log.Fatalf("ERROR: Could not initialize database: %v", err)
-	// }
-
-	workerService := service.NewWorkerService(workerRepo)
-	applicantService := service.NewApplicantService(applicantRepo)
 	categoryService := service.NewCategoryService(categoryRepo)
-	clientService := service.NewClientService(clientRepo)
+	isColdStart, err := categoryService.IsColdStart(ctx)
+	if err != nil {
+		return adapter.ClientHandler{}, err
+	}
+	var workerCategoryId *uuid.UUID
+	var applicantCategoryId *uuid.UUID
+	if isColdStart {
+		applicantCategoryId, workerCategoryId, err = categoryService.Populate(ctx)
+		if err != nil {
+			return adapter.ClientHandler{}, err
+		}
+	} else {
+		applicantCategoryId, workerCategoryId, err = categoryService.Realize(ctx)
+		if err != nil {
+			return adapter.ClientHandler{}, err
+		}
+	}
 
-	return adapter.NewClientHandler(applicantService, workerService, categoryService, clientService)
+	applicantRepo := repository.NewApplicantRepository(conn, applicantCategoryId)
+	applicantService := service.NewApplicantService(applicantRepo)
+	workerRepo := repository.NewWorkerRepository(conn, workerCategoryId)
+	workerService := service.NewWorkerService(workerRepo)
+
+	clienRepo := repository.NewClientRepository(conn)
+	clientService := service.NewClientService(clienRepo)
+	return adapter.NewClientHandler(applicantService, workerService, categoryService, clientService), nil
 }

@@ -13,10 +13,10 @@ import (
 
 type WorkerRepository struct {
 	db               *pgxpool.Pool
-	workerCategoryId uuid.UUID
+	workerCategoryId *uuid.UUID
 }
 
-func NewWorkerRepository(conn *pgxpool.Pool, categoryId uuid.UUID) out.WorkerRepository {
+func NewWorkerRepository(conn *pgxpool.Pool, categoryId *uuid.UUID) out.WorkerRepository {
 	return &WorkerRepository{
 		db:               conn,
 		workerCategoryId: categoryId,
@@ -55,6 +55,7 @@ func (w *WorkerRepository) GetWorkScheduleById(ctx context.Context, id *uuid.UUI
 	var schedule domain.WorkSchedule
 	err := w.db.QueryRow(ctx, query, args).Scan(&schedule.Id, &schedule.StartTime, &schedule.EndTime)
 	if err != nil {
+		log.Printf("Error: %v", err)
 		return nil, err
 	}
 	return &schedule, nil

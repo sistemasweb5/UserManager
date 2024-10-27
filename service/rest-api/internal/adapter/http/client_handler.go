@@ -76,8 +76,7 @@ func (handler *ClientHandler) GetAllApplicant(context echo.Context) error {
 func (handler *ClientHandler) GetAllWorker(context echo.Context) error {
 	items, err := handler.workerService.GetAllWorker(context.Request().Context())
 	if err != nil {
-		log.Panic("Error: %v", err)
-
+		log.Printf("Error: %v", err)
 		return context.JSON(http.StatusInternalServerError, map[string]string{
 			"message": "Unable to retrieve clients",
 		})
