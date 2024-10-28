@@ -32,31 +32,30 @@ func (db *Database) execute(query string, args pgx.NamedArgs) error {
 	return nil
 }
 
-// func (db *Database) InsertClient(client *Client) error {
-// 	query := `
-//         INSERT INTO client (id, name, emailAddress, categoryId, workScheduleId) VALUES (@id, @name, @emailAddress, @categoryId, @workScheduleId)
-//     `
-// 	args := pgx.NamedArgs{
-// 		"id":             client.Id,
-// 		"name":           client.Name,
-// 		"emailAddress":   client.EmailAddress,
-// 		"categoryId":     client.CategoryId,
-// 		"workScheduleId": client.WorkScheduleId,
-// 	}
-//
-// 	return db.execute(query, args)
-// }
+func (db *Database) InsertWorker(worker *Worker) error {
+	query := `
+        INSERT INTO client (id, name, emailAddress, categoryId, workScheduleId) VALUES (@id, @name, @emailAddress, @categoryId, @workScheduleId)
+    `
+	args := pgx.NamedArgs{
+		"id":             worker.Id,
+		"name":           worker.Name,
+		"emailAddress":   worker.EmailAddress,
+		"categoryId":     worker.CategoryId,
+		"workScheduleId": worker.WorkScheduleId,
+	}
+
+	return db.execute(query, args)
+}
 
 func (db *Database) InsertApplicant(client *Applicant) error {
 	query := `
-        INSERT INTO client (id, name, emailAddress, categoryId, workScheduleId) VALUES (@id, @name, @emailAddress, @categoryId, @workScheduleId)
+        INSERT INTO client (id, name, emailAddress, categoryId) VALUES (@id, @name, @emailAddress, @categoryId)
     `
 	args := pgx.NamedArgs{
 		"id":             client.Id,
 		"name":           client.Name,
 		"emailAddress":   client.EmailAddress,
 		"categoryId":     client.CategoryId,
-		"workScheduleId": "dbbf5f04-3631-47db-a368-2627bcd196a3",
 	}
 
 	return db.execute(query, args)
