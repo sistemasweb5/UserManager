@@ -20,6 +20,7 @@ func RegisterRoutes(e *echo.Echo, conn *pgxpool.Pool) {
 	authHandler := adapter.NewAuthHandler(authService)
 
 	e.POST("/user/login", authHandler.SignIn)
+	e.GET("/user/id", authHandler.GetUserIdByToken)
 	e.POST("/user/logout", authHandler.Logout)
 	e.POST("/user/signup", authHandler.SignUp)
 	e.POST("/user/confirm", authHandler.ConfirmAccount)

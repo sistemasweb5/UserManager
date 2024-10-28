@@ -87,3 +87,24 @@ func (c *CognitoClient) ConfirmAccount(confirmation domain.UserConfirmation) err
 	_, err := c.cognitoClient.ConfirmSignUp(confirmInput)
 	return err
 }
+
+func (c *CognitoClient) GetUserIdByToken(accessToken string) (string, error) {
+	getUserInput := &cognito.GetUserInput{
+		AccessToken: aws.String(accessToken),
+	}
+
+	userResult, err := c.cognitoClient.GetUser(getUserInput)
+	if err != nil {
+		return "", err
+	}
+
+	var userID string
+	for _, attr := range userResult.UserAttributes {
+		if *attr.Name == "sub" {
+			userID = *attr.Value
+			break
+		}
+	}
+
+	return userID, nil
+}

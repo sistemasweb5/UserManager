@@ -81,3 +81,17 @@ func (h *AuthHandler) ConfirmAccount(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, map[string]string{"message": "Account confirmed"})
 }
+
+func (h *AuthHandler) GetUserIdByToken(c echo.Context) error {
+	accessToken := strings.TrimPrefix(c.Request().Header.Get("Authorization"), "Bearer ")
+	if accessToken == "" {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Authorization token required"})
+	}
+
+	id, err := h.service.GetUserIdByToken(accessToken)
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, map[string]string{"error": fmt.Sprintln(err)})
+	}
+
+	return c.JSON(http.StatusOK, map[string]string{"id": id})
+}

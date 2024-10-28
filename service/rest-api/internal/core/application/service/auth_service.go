@@ -30,3 +30,7 @@ func (s *AuthService) SignUp(user domain.UserSignUp) (string, error) {
 func (s *AuthService) ConfirmAccount(user domain.UserConfirmation) error {
 	return s.authService.ConfirmAccount(user)
 }
+
+func (s *AuthService) GetUserIdByToken(accessToken string) (string, error) {
+	return s.authService.GetUserIdByToken(accessToken)
+}
