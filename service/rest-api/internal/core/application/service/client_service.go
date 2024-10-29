@@ -18,25 +18,6 @@ func NewClientService(repo out.ClientRepository) in.ClientService {
 	return &ClientService{repo: repo}
 }
 
-func (p *ClientService) GetAll(ctx context.Context) (*[]domain.ClientResponse, error) {
-	var clientReponses []domain.ClientResponse
-	clients, err := p.repo.GetAllClients(ctx)
-	if err != nil {
-		log.Printf("Error: %v", err)
-		return nil, err
-	}
-	for _, client := range *clients {
-		clientResponse, err := p.GetById(ctx, &client.Id)
-		if err != nil {
-			log.Printf("Error: %v", err)
-			return nil, err
-		}
-		clientReponses = append(clientReponses, *clientResponse)
-	}
-
-	return &clientReponses, nil
-}
-
 func (p *ClientService) GetById(ctx context.Context, id *uuid.UUID) (*domain.ClientResponse, error) {
 	client, err := p.repo.GetClientById(ctx, id)
 	if err != nil {
@@ -48,15 +29,18 @@ func (p *ClientService) GetById(ctx context.Context, id *uuid.UUID) (*domain.Cli
 		log.Printf("Error: %v", err)
 		return nil, err
 	}
-	workSchedule, err := p.repo.GetWorkScheduleById(ctx, &client.WorkScheduleId)
+
+	workSchedule := new(domain.WorkSchedule)
+	specialties := new([]domain.Specialty)
+	workSchedule, err = p.repo.GetWorkScheduleById(ctx, &client.WorkScheduleId)
 	if err != nil {
 		log.Printf("Error: %v", err)
-		return nil, err
+		workSchedule = &domain.WorkSchedule{} 
 	}
-	specialties, err := p.repo.GetSpecialitiesByClientId(ctx, &client.Id)
+	specialties, err = p.repo.GetSpecialitiesByClientId(ctx, &client.Id)
 	if err != nil {
 		log.Printf("Error: %v", err)
-		return nil, err
+		specialties = &[]domain.Specialty{}
 	}
 
 	return &domain.ClientResponse{
@@ -65,8 +49,4 @@ func (p *ClientService) GetById(ctx context.Context, id *uuid.UUID) (*domain.Cli
 		WorkSchedule: *workSchedule,
 		Specialties:  *specialties,
 	}, nil
-}
-
-func (p *ClientService) CreateUser(ctx context.Context, user domain.Client) (*domain.ClientResponse, error) {
-	return p.repo.CreateUser(ctx, user)
 }

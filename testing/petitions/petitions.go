@@ -18,7 +18,7 @@ func marshalBody(body *any) *[]byte {
 }
 
 func BodyRequest(httpMethod string, postURL url.URL, body any) (*http.Response, error) {
-	log.Printf("Processing %s request: %s", httpMethod, postURL.String())
+	// log.Printf("Processing %s request: %s", httpMethod, postURL.String())
 	jsonBody := marshalBody(&body)
 	bodyReader := bytes.NewReader(*jsonBody)
 
@@ -42,7 +42,7 @@ func BodyRequest(httpMethod string, postURL url.URL, body any) (*http.Response, 
 }
 
 func SimpleRequest(postURL url.URL) (*http.Response, error) {
-	log.Printf("Processing GET request: %s", postURL.String())
+	// log.Printf("Processing GET request: %s", postURL.String())
 	resp, err := http.Get(postURL.String())
 	if err != nil {
 		log.Printf("An error occured during processing: %v", err)
@@ -53,7 +53,7 @@ func SimpleRequest(postURL url.URL) (*http.Response, error) {
 }
 
 func SimplePostRequest(postURL url.URL, data interface{}, token string) (*http.Response, error) {
-	log.Printf("Processing POST request: %s", postURL.String())
+	// log.Printf("Processing POST request: %s", postURL.String())
 
 	body, err := json.Marshal(data)
 	if err != nil {

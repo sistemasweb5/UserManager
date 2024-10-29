@@ -7,8 +7,7 @@ import (
 	"github.com/google/uuid"
 )
 
+// Deprecated: Use CategoryService, WorkerService and ApplicantService instead.
 type ClientService interface {
-	GetAll(ctx context.Context) (*[]domain.ClientResponse, error)
 	GetById(ctx context.Context, id *uuid.UUID) (*domain.ClientResponse, error)
-	CreateUser(ctx context.Context, user domain.Client) (*domain.ClientResponse, error)
 }

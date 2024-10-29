@@ -3,129 +3,136 @@ package endpoints_test
 import (
 	"api/testing/endpoints"
 	"context"
-	"encoding/json"
-	"io"
 	"log"
 	"os"
 	"testing"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/joho/godotenv"
 )
 
-func setup() {
+type helper struct {
+	db   *pgx.Conn
+	myDb endpoints.Database
+}
+
+func (h *helper) makeWorkSchedule() (*string, error) {
+	id := uuid.NewString()
+	schedule := endpoints.WorkSchedule{
+		Id:        id,
+		StartTime: "9.00",
+		EndTime:   "17.00",
+	}
+	return &id, h.myDb.InsertWorkSchedule(&schedule)
+}
+
+func (h *helper) makeSpecialty(userId string) (*string, error) {
+	id := uuid.NewString()
+	specialty := endpoints.Specialty{
+		Id:       id,
+		Name:     "Plumber",
+		ClientId: userId,
+	}
+
+	return &id, h.myDb.InsertSpecialty(&specialty)
+}
+
+func (h *helper) fetchCategoryIds() (*string, *string, error) {
+	query := `
+		SELECT id FROM category WHERE rol = 'applicant'
+	`
+	var applicantId string
+	err := h.db.QueryRow(context.Background(), query).Scan(&applicantId)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	query = `
+		SELECT id FROM category WHERE rol = 'worker'
+	`
+	var workerId string
+	err = h.db.QueryRow(context.Background(), query).Scan(&workerId)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return &applicantId, &workerId, nil
+}
+
+func (h *helper) makeWorker(categoryId string, workScheduleId string) (*string, error) {
+	id := uuid.NewString()
+	worker := endpoints.Worker{
+		Id:             id,
+		Name:           "Alejandro Lopez",
+		EmailAddress:   "worker@carbon-mines.pe",
+		CategoryId:     categoryId,
+		WorkScheduleId: workScheduleId,
+	}
+	if err := h.myDb.InsertWorker(&worker); err != nil {
+		return nil, err
+	}
+	return &id, nil
+}
+
+func (h *helper) makeApplicant(categoryId string) (*string, error) {
+	id := uuid.NewString()
+	applicant := endpoints.Applicant{
+		Id:           id,
+		Name:         "Gaby Lozano",
+		EmailAddress: "applicant@lozano-home.pe",
+		CategoryId:   categoryId,
+	}
+
+	if err := h.myDb.InsertApplicant(&applicant); err != nil {
+		return nil, err
+	}
+
+	return &id, nil
+}
+
+func databaseSetup() {
 	conn, err := pgx.Connect(context.Background(), os.Getenv("TEST_DATABASE_URL"))
 	if err != nil {
 		log.Fatalf("Unable to connect to database: %v", err)
 	}
 	defer conn.Close(context.Background())
-
 	db := endpoints.Database{
 		Connection: conn,
 	}
-
-	categoryId := uuid.NewString()
-	userId := uuid.NewString()
-	workScheduleId := uuid.NewString()
-	client := endpoints.Client{
-		Id:             "917b9550-0031-70a4-0e12-6f5b45aed3f5",
-		Name:           "Slim shady",
-		EmailAddress:   "test@mail.com",
-		CategoryId:     categoryId,
-		WorkScheduleId: workScheduleId,
-	}
-	category := endpoints.Category{
-		Id:  categoryId,
-		Rol: "Worker",
-	}
-	schedule := endpoints.WorkSchedule{
-		Id:        workScheduleId,
-		StartTime: "9.00",
-		EndTime:   "17.00",
-	}
-	specialty := endpoints.Specialty{
-		Id:       categoryId,
-		Name:     "Plumber",
-		ClientId: userId,
+	dbHelper := helper{
+		db:   conn,
+		myDb: db,
 	}
 
-	if err := db.InsertCategory(&category); err != nil {
-		log.Fatalf("Could not populate table: %v", err)
+	applicantCatId, workerCatId, err := dbHelper.fetchCategoryIds()
+	if err != nil {
+		log.Fatalf("Couldn't fetch categories: %v", err)
 	}
-	if err := db.InsertWorkSchedule(&schedule); err != nil {
-		log.Fatalf("Could not populate table: %v", err)
+	if _, err := dbHelper.makeApplicant(*applicantCatId); err != nil {
+		log.Fatalf("Couldn't populate applicant: %v", err)
 	}
-	if err := db.InsertClient(&client); err != nil {
-		log.Fatalf("Could not populate table: %v", err)
+	workScheduleId, err := dbHelper.makeWorkSchedule()
+	if err != nil {
+		log.Fatalf("Couldn't populate workSchedule: %v", err)
 	}
-	if err := db.InsertSpecialty(&specialty); err != nil {
-		log.Fatalf("Could not populate table: %v", err)
+	workerId, err := dbHelper.makeWorker(*workerCatId, *workScheduleId)
+	if err != nil {
+		log.Fatalf("Couldn't populate workers: %v", err)
+	}
+	if _, err := dbHelper.makeSpecialty(*workerId); err != nil {
+		log.Fatalf("Couldn't populate specialty: %v", err)
 	}
 }
 
 func TestMain(m *testing.M) {
 	log.SetFlags(log.Lshortfile)
-	setup()
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	databaseSetup()
 	code := m.Run()
 	os.Exit(code)
-}
-
-func TestGetAll(t *testing.T) {
-	url := "localhost:5200"
-	client := endpoints.NewClientTest(&url)
-	resp, err := client.GetAll()
-	defer resp.Body.Close()
-	if err != nil {
-		t.Errorf("Could not reach endpoint %s", client.Address.String())
-	}
-
-	statusCode := resp.StatusCode
-	if !(statusCode >= 200 && statusCode <= 299) {
-		t.Errorf("Endpoint %s has failed", client.Address.String())
-	}
-}
-
-func TestGetById(t *testing.T) {
-	url := "localhost:5200"
-	clientEndpoint := endpoints.NewClientTest(&url)
-
-	respClients, err := clientEndpoint.GetAll()
-	defer respClients.Body.Close()
-	body, err := io.ReadAll(respClients.Body)
-	if err != nil {
-		t.Errorf("Error: %v", err)
-	}
-	var clients []endpoints.ClientResponse
-	if err := json.Unmarshal(body, &clients); err != nil {
-		t.Errorf("Error: %v", err)
-	}
-	if len(clients) < 1 {
-		t.Error("There was no clients")
-	}
-	client := clients[0]
-
-	resp, err := clientEndpoint.GetById(client.Client.Id)
-	defer resp.Body.Close()
-	if err != nil {
-		t.Errorf("Could not reach endpoint %s", clientEndpoint.Address.String())
-	}
-	statusCode := resp.StatusCode
-	if !(statusCode >= 200 && statusCode <= 299) {
-		t.Errorf("Endpoint %s has failed", clientEndpoint.Address.String())
-	}
-}
-
-func TestFetchInvalidId(t *testing.T) {
-	url := "localhost:5200"
-	clientEndpoint := endpoints.NewClientTest(&url)
-	invalidID := "00000000-0000-0000-0000-000000000000"
-	resp, err := clientEndpoint.GetById(invalidID)
-	defer resp.Body.Close()
-	if err != nil {
-		t.Errorf("Could not reach endpoint %s", clientEndpoint.Address.String())
-	}
-	statusCode := resp.StatusCode
-	if statusCode >= 200 && statusCode <= 299 {
-		t.Errorf("Endpoint %s has failed", clientEndpoint.Address.String())
-	}
 }

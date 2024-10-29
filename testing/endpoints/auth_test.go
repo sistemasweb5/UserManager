@@ -4,13 +4,14 @@ import (
 	"api/testing/endpoints"
 	"fmt"
 	"net/http"
+	"os"
 	"testing"
 
 	"log"
 )
 
 func TestAuthHandler_SignIn_Success(t *testing.T) {
-	url := "localhost:5200"
+	url := os.Getenv("USER_MANAGER_HOSTNAME")
 	path := "user/login"
 	h := endpoints.NewAuthTest(&url, &path)
 
@@ -32,7 +33,7 @@ func TestAuthHandler_SignIn_Success(t *testing.T) {
 }
 
 func TestAuthHandler_SignIn_Unauthorized(t *testing.T) {
-	url := "localhost:5200"
+	url := os.Getenv("USER_MANAGER_HOSTNAME")
 	path := "user/login"
 	h := endpoints.NewAuthTest(&url, &path)
 
@@ -61,7 +62,7 @@ type AuthResponse struct {
 }
 
 func TestAuthHandler_SignOut_Success(t *testing.T) {
-	url := "localhost:5200"
+	url := os.Getenv("USER_MANAGER_HOSTNAME")
 	path := "user/login"
 	h := endpoints.NewAuthTest(&url, &path)
 
@@ -92,7 +93,7 @@ func TestAuthHandler_SignOut_Success(t *testing.T) {
 }
 
 func TestAuthHandler_SignOut_Unauthorized(t *testing.T) {
-	url := "localhost:5200"
+	url := os.Getenv("USER_MANAGER_HOSTNAME")
 	path := "user/logout"
 	h := endpoints.NewAuthTest(&url, &path)
 
